@@ -1,0 +1,7 @@
+## Interface: 11200
+## Title: Sell Value
+## Notes: Display the sell value of an item when not at a vendor
+## SavedVariables: SellValues
+## LoadOnDemand: 0
+## Author: CapnBry & Greenman & kebabstorm
+SellValue.xml
