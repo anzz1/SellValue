@@ -1,5 +1,5 @@
 # Improved SellValue
-Adds vendor prices to tooltips
+Adds vendor prices to tooltips for WoW Vanilla 1.12.1
 
 Includes a database to initialize default prices from vanilla core.  
 
