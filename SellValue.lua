@@ -14,6 +14,25 @@ local function hooksecurefunc(arg1, arg2, arg3)
 	end
 end
 
+function SellValue_SetTooltip(itemID, stackCount)
+	local price = SellValues[itemID];
+
+	if price then
+		if price == 0 then
+			GameTooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
+		else
+			SetTooltipMoney(GameTooltip, price * stackCount);
+			
+		end  -- if price > 0
+
+		-- Adjust width and height to account for new lines
+		GameTooltip:SetHeight(GameTooltip:GetHeight() + 14);
+		if GameTooltip:GetWidth() < 120 then 
+			GameTooltip:SetWidth(120); 
+		end
+	end  -- if price
+end
+
 function SellValue_OnLoad()
 
 	-- Get initial prices from database
@@ -25,29 +44,25 @@ function SellValue_OnLoad()
 	
 	SellValue_Tooltip:SetScript("OnTooltipAddMoney", SellValue_OnTooltipAddMoney);
 
+	-- Hook loot tooltip
+	hooksecurefunc (GameTooltip, "SetLootItem",
+	function(tip, lootIndex)
+    if SellValues then
+    		local _, _, stackCount = GetLootSlotInfo(lootIndex);
+			if stackCount ~= 0 then
+				local link = GetLootSlotLink(lootIndex);
+				SellValue_SetTooltip(SellValue_IDFromLink(link), stackCount);
+			end
+        end
+    end
+	);
+
 	-- Hook bag tooltip
 	hooksecurefunc (GameTooltip, "SetBagItem",
 	function(tip, bag, slot)
     if SellValues and not MerchantFrame:IsVisible() then
     		local _, stackCount = GetContainerItemInfo(bag, slot);
-            local itemID = SellValue_GetItemID(bag, slot);
- 
-            local price = SellValues[itemID];
-
-            if price then
-                if price == 0 then
-                    GameTooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
-                else
-                    SetTooltipMoney(GameTooltip, price * stackCount);
-                    
-                end  -- if price > 0
-
-                -- Adjust width and height to account for new lines
-                GameTooltip:SetHeight(GameTooltip:GetHeight() + 14);
-                if GameTooltip:GetWidth() < 120 then 
-                    GameTooltip:SetWidth(120); 
-                end
-            end  -- if price
+			SellValue_SetTooltip(SellValue_GetItemID(bag, slot), stackCount);
         end
     end
 	);
@@ -58,24 +73,7 @@ function SellValue_OnLoad()
 	function(tip, unit, slot)
     if SellValues and not MerchantFrame:IsVisible() and slot > 19 then
     		local stackCount = GetInventoryItemCount(unit, slot);
-            local itemID = SellValue_GetItemID(-1, slot);
- 
-            local price = SellValues[itemID];
-
-            if price then
-                if price == 0 then
-                    GameTooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
-                else
-                    SetTooltipMoney(GameTooltip, price * stackCount);
-                    
-                end  -- if price > 0
-
-                -- Adjust width and height to account for new lines
-                GameTooltip:SetHeight(GameTooltip:GetHeight() + 14);
-                if GameTooltip:GetWidth() < 120 then 
-                    GameTooltip:SetWidth(120); 
-                end
-            end  -- if price
+			SellValue_SetTooltip(SellValue_GetItemID(-1, slot), stackCount);
         end
     end
 	);
@@ -86,24 +84,7 @@ function SellValue_OnLoad()
     if SellValues and (qtype == "reward" or qtype == "choice") then
     		local link = GetQuestItemLink(qtype, slot);
     		local _,_,stackCount = GetQuestItemInfo(qtype, slot);
-            local itemID = SellValue_IDFromLink(link);
- 
-            local price = SellValues[itemID];
-
-            if price then
-                if price == 0 then
-                    GameTooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
-                else
-                    SetTooltipMoney(GameTooltip, price * stackCount);
-                    
-                end  -- if price > 0
-
-                -- Adjust width and height to account for new lines
-                GameTooltip:SetHeight(GameTooltip:GetHeight() + 14);
-                if GameTooltip:GetWidth() < 120 then 
-                    GameTooltip:SetWidth(120); 
-                end
-            end  -- if price
+			SellValue_SetTooltip(SellValue_IDFromLink(link), stackCount);
         end
     end
 	);
@@ -124,24 +105,7 @@ function SellValue_OnLoad()
     		end
     		
     		local link = GetQuestLogItemLink(qtype, slot);
-            local itemID = SellValue_IDFromLink(link);
- 
-            local price = SellValues[itemID];
-
-            if price then
-                if price == 0 then
-                    GameTooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
-                else
-                    SetTooltipMoney(GameTooltip, price * stackCount);
-                    
-                end  -- if price > 0
-
-                -- Adjust width and height to account for new lines
-                GameTooltip:SetHeight(GameTooltip:GetHeight() + 14);
-                if GameTooltip:GetWidth() < 120 then 
-                    GameTooltip:SetWidth(120); 
-                end
-            end  -- if price
+			SellValue_SetTooltip(SellValue_IDFromLink(link), stackCount);
         end
     end
 	);
