@@ -117,14 +117,11 @@ function SellValue_OnLoad()
 	-- Hook trade skill tooltip
 	hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(tip, tradeItemIndex, reagentIndex)
 		if SellValue then
-			DEFAULT_CHAT_FRAME:AddMessage(tradeItemIndex);
-			DEFAULT_CHAT_FRAME:AddMessage(reagentIndex);
 			local stackCount = nil;
 			local link = nil;
 
 			if reagentIndex then
-				local reagentName, _, count = GetTradeSkillReagentInfo(tradeItemIndex, reagentIndex);
-				stackCount = count;
+				_, _, stackCount = GetTradeSkillReagentInfo(tradeItemIndex, reagentIndex);
 				link = GetTradeSkillReagentItemLink(tradeItemIndex, reagentIndex);
 			else
 				stackCount = GetTradeSkillNumMade(tradeItemIndex);
