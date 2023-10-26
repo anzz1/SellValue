@@ -14,21 +14,24 @@ local function hooksecurefunc(arg1, arg2, arg3)
 	end
 end
 
-function SellValue_SetTooltip(itemID, stackCount)
-	local price = SellValues[itemID];
+function SellValue_SetTooltip(itemID, stackCount, tooltip)
+	if not tooltip then
+		tooltip = GameTooltip
+	end
 
+	local price = SellValues[itemID];
 	if price then
 		if price == 0 then
-			GameTooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
+			tooltip:AddLine(ITEM_UNSELLABLE, 1.0, 1.0, 1.0);
 		else
-			SetTooltipMoney(GameTooltip, price * stackCount);
+			SetTooltipMoney(tooltip, price * stackCount);
 
 		end  -- if price > 0
 
 		-- Adjust width and height to account for new lines
-		GameTooltip:SetHeight(GameTooltip:GetHeight() + 14);
-		if GameTooltip:GetWidth() < 120 then
-			GameTooltip:SetWidth(120);
+		tooltip:SetHeight(tooltip:GetHeight() + 14);
+		if tooltip:GetWidth() < 120 then
+			tooltip:SetWidth(120);
 		end
 	end  -- if price
 end
@@ -43,6 +46,17 @@ function SellValue_OnLoad()
 	SellValue_Saved_OnTooltipAddMoney = SellValue_Tooltip:GetScript("OnTooltipAddMoney");
 
 	SellValue_Tooltip:SetScript("OnTooltipAddMoney", SellValue_OnTooltipAddMoney);
+
+	-- Hook item links tooltip
+	local org_OnHyperlinkShow = ChatFrame_OnHyperlinkShow
+	function ChatFrame_OnHyperlinkShow(link, text, button)
+		-- First, call the original function
+		org_OnHyperlinkShow(link, text, button);
+
+		-- Now, call your custom function
+		local itemID = SellValue_IDFromLink(link);
+		SellValue_SetTooltip(itemID, 1, ItemRefTooltip);
+	end
 
 	-- Hook loot tooltip
 	hooksecurefunc(GameTooltip, "SetLootItem", function(tip, lootIndex)
