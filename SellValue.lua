@@ -19,6 +19,9 @@ function SellValue_SetTooltip(itemID, stackCount, tooltip)
 		tooltip = GameTooltip
 	end
 
+	if not SellValues then
+		return
+	end
 	local price = SellValues[itemID];
 	if price then
 		if price == 0 then
@@ -60,21 +63,19 @@ function SellValue_OnLoad()
 
 	-- Hook loot tooltip
 	hooksecurefunc(GameTooltip, "SetLootItem", function(tip, lootIndex)
-		if SellValues then
-			local _, _, stackCount = GetLootSlotInfo(lootIndex);
-			if stackCount ~= 0 then
-				local link = GetLootSlotLink(lootIndex);
-				local itemID = SellValue_IDFromLink(link)
+		local _, _, stackCount = GetLootSlotInfo(lootIndex);
+		if stackCount > 0 then
+			local link = GetLootSlotLink(lootIndex);
+			local itemID = SellValue_IDFromLink(link)
 
-				SellValue_SetTooltip(itemID, stackCount);
-			end
+			SellValue_SetTooltip(itemID, stackCount);
 		end
 	end
 	);
 
 	-- Hook bag tooltip
 	hooksecurefunc(GameTooltip, "SetBagItem", function(tip, bag, slot)
-		if SellValues and not MerchantFrame:IsVisible() then
+		if not MerchantFrame:IsVisible() then
 			local _, stackCount = GetContainerItemInfo(bag, slot);
 			local itemID = SellValue_GetItemID(bag, slot);
 
@@ -86,7 +87,7 @@ function SellValue_OnLoad()
 
 	-- Hook bank tooltip
 	hooksecurefunc(GameTooltip, "SetInventoryItem", function(tip, unit, slot)
-		if SellValues and not MerchantFrame:IsVisible() and slot > 19 then
+		if not MerchantFrame:IsVisible() and slot > 19 then
 			local stackCount = GetInventoryItemCount(unit, slot);
 			local itemID = SellValue_GetItemID(-1, slot);
 
@@ -97,7 +98,7 @@ function SellValue_OnLoad()
 
 	-- Hook quest reward tooltip
 	hooksecurefunc(GameTooltip, "SetQuestItem", function(tip, qtype, slot)
-		if SellValues and (qtype == "reward" or qtype == "choice") then
+		if qtype == "reward" or qtype == "choice" then
 			local link = GetQuestItemLink(qtype, slot);
 			local _, _, stackCount = GetQuestItemInfo(qtype, slot);
 			local itemID = SellValue_IDFromLink(link);
@@ -109,42 +110,38 @@ function SellValue_OnLoad()
 
 	-- Hook questlog reward tooltip
 	hooksecurefunc(GameTooltip, "SetQuestLogItem", function(tip, qtype, slot)
-		if SellValues then
-			local stackCount = nil;
+		local stackCount = nil;
 
-			if qtype == "reward" then
-				_, _, stackCount = GetQuestLogRewardInfo(slot);
-			elseif qtype == "choice" then
-				_, _, stackCount = GetQuestLogChoiceInfo(slot);
-			else
-				return
-			end
-
-			local link = GetQuestLogItemLink(qtype, slot);
-			local itemID = SellValue_IDFromLink(link);
-
-			SellValue_SetTooltip(itemID, stackCount);
+		if qtype == "reward" then
+			_, _, stackCount = GetQuestLogRewardInfo(slot);
+		elseif qtype == "choice" then
+			_, _, stackCount = GetQuestLogChoiceInfo(slot);
+		else
+			return
 		end
+
+		local link = GetQuestLogItemLink(qtype, slot);
+		local itemID = SellValue_IDFromLink(link);
+
+		SellValue_SetTooltip(itemID, stackCount);
 	end
 	);
 
 	-- Hook trade skill tooltip
 	hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(tip, tradeItemIndex, reagentIndex)
-		if SellValue then
-			local stackCount = nil;
-			local link = nil;
+		local stackCount = nil;
+		local link = nil;
 
-			if reagentIndex then
-				_, _, stackCount = GetTradeSkillReagentInfo(tradeItemIndex, reagentIndex);
-				link = GetTradeSkillReagentItemLink(tradeItemIndex, reagentIndex);
-			else
-				stackCount = GetTradeSkillNumMade(tradeItemIndex);
-				link = GetTradeSkillItemLink(tradeItemIndex);
-			end
-
-			local itemID = SellValue_IDFromLink(link);
-			SellValue_SetTooltip(itemID, stackCount);
+		if reagentIndex then
+			_, _, stackCount = GetTradeSkillReagentInfo(tradeItemIndex, reagentIndex);
+			link = GetTradeSkillReagentItemLink(tradeItemIndex, reagentIndex);
+		else
+			stackCount = GetTradeSkillNumMade(tradeItemIndex);
+			link = GetTradeSkillItemLink(tradeItemIndex);
 		end
+
+		local itemID = SellValue_IDFromLink(link);
+		SellValue_SetTooltip(itemID, stackCount);
 	end
 	);
 end
