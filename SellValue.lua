@@ -128,7 +128,7 @@ function SellValue_OnLoad()
 				link = GetTradeSkillItemLink(tradeItemIndex);
 			end
 
-			local itemID = SellValue_IDFromLink(link);;
+			local itemID = SellValue_IDFromLink(link);
 			SellValue_SetTooltip(itemID, stackCount);
 		end
 	end
