@@ -44,6 +44,20 @@ function SellValue_OnLoad()
 
 	SellValue_Tooltip:SetScript("OnTooltipAddMoney", SellValue_OnTooltipAddMoney);
 
+	-- Hook loot tooltip
+	hooksecurefunc(GameTooltip, "SetLootItem", function(tip, lootIndex)
+		if SellValues then
+			local _, _, stackCount = GetLootSlotInfo(lootIndex);
+			if stackCount ~= 0 then
+				local link = GetLootSlotLink(lootIndex);
+				local itemID = SellValue_IDFromLink(link)
+
+				SellValue_SetTooltip(itemID, stackCount);
+			end
+		end
+	end
+	);
+
 	-- Hook bag tooltip
 	hooksecurefunc(GameTooltip, "SetBagItem", function(tip, bag, slot)
 		if SellValues and not MerchantFrame:IsVisible() then
