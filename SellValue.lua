@@ -96,7 +96,6 @@ function SellValue_OnLoad()
 	-- Hook questlog reward tooltip
 	hooksecurefunc(GameTooltip, "SetQuestLogItem", function(tip, qtype, slot)
 		if SellValues then
-
 			local stackCount = nil;
 
 			if qtype == "reward" then
@@ -109,6 +108,23 @@ function SellValue_OnLoad()
 
 			local link = GetQuestLogItemLink(qtype, slot);
 			local itemID = SellValue_IDFromLink(link);
+
+			SellValue_SetTooltip(itemID, stackCount);
+		end
+	end
+	);
+
+	-- Hook trade skill tooltip
+	hooksecurefunc(GameTooltip, "SetTradeSkillItem", function(tip, tradeItemIndex, reagentIndex)
+		if SellValue then
+
+			local stackCount = GetTradeSkillNumMade(tradeItemIndex);
+
+			local link = GetTradeSkillItemLink(tradeItemIndex);
+			local itemID = SellValue_IDFromLink(link);
+			DEFAULT_CHAT_FRAME:AddMessage(link);
+			DEFAULT_CHAT_FRAME:AddMessage(itemID);
+			DEFAULT_CHAT_FRAME:AddMessage(stackCount);
 
 			SellValue_SetTooltip(itemID, stackCount);
 		end
