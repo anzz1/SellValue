@@ -96,6 +96,13 @@ function SellValue_OnLoad()
 	end
 	);
 
+	-- Hook hyper links, used for BankItems addon
+	hooksecurefunc(GameTooltip, "SetHyperlink", function(tip, link)
+		local itemID = SellValue_IDFromLink(link);
+		SellValue_SetTooltip(itemID, 1);
+	end
+	);
+
 	-- Hook quest reward tooltip
 	hooksecurefunc(GameTooltip, "SetQuestItem", function(tip, qtype, slot)
 		if qtype == "reward" or qtype == "choice" then
