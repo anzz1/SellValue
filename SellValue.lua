@@ -7,7 +7,7 @@ local function hooksecurefunc(arg1, arg2, arg3)
 	local orig = arg1[arg2]
 	arg1[arg2] = function(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20)
 		-- Hack to avoid error being thrown when using in combination with EQL3 (Extended Quest Log)
-		if arg2 == "SetQuestLogItem" then
+		if arg2 == "SetQuestLogItem" and a2 == "choice" then
 			t1, t2, stackCount = GetQuestLogChoiceInfo(a3);
 			if t1 == nil and t2 == nil then
 				return
